@@ -8,7 +8,7 @@ const message = document.querySelector(".message");
 const playAgainButton = document.querySelector(".play-again");
 
 let word = "magnolia";
-const guessedLetters = [];
+let guessedLetters = [];
 let remainingGuesses = 8;
 
 //Add an Async Function
@@ -16,30 +16,24 @@ const getWord = async function () {
     const response = await fetch("https://gist.githubusercontent.com/skillcrush-curriculum/7061f1d4d3d5bfe47efbfbcfe42bf57e/raw/5ffc447694486e7dea686f34a6c085ae371b43fe/words.txt");
     //fetching data from a text file instead of a JSON file
     const words = await response.text();
-    //this is the delimiter you'll use to create the array
     const wordArray = words.split("\n");
-    //console.log(wordArray);
-    //create a variable to pull a random index from the wordArray
     const randomIndex = Math.floor(Math.random() * wordArray.length);
-    //pull out a random word from the array and remove any extra whitespace around the word
-    word = wordArray[radomIndex].trim();
+    word = wordArray[randomIndex].trim();
     placeholder(word);
 };
 
-    //Call the New Function
-    getWord();
+//Call the New Function
+getWord();
 
 //Write a Function to Add Placeholders for Each Letter
 const placeholder = function (word) {
     const placeholderLetters = [];
     for (const letter of word) {
-        console.log(letter);
+        //console.log(letter);
         placeholderLetters.push("●");
     }
     wordInProgress.innerText = placeholderLetters.join("");
 };
-
-placeholder(word);
 
 //Add an Event Listener for the Button
 guessLetterButton.addEventListener("click", function (e) {
@@ -140,6 +134,7 @@ const countRemainingGuesses = function (guess) {
 
     if (remainingGuesses === 0) {
         message.innerHTML = `Game Over! The word was <span class="highlight">${word}</span>.`;
+        startOver();
     } else if (remainingGuesses === 1) {
         remainingGuessesSpan.innerText = `${remainingGuesses} guess`;
     } else {
@@ -154,10 +149,36 @@ const checkIfPlayerWon = function () {
         message.classList.add("win");
         //update the paragraph's contents
         message.innerHTML = `<p class="highlight">You guessed correct the word! Congrats!</p>`;
+        
+        //call the function when the game is over
+        startOver();
     }
 };
 
+//create function to hide and show elements
+const startOver = function () {
+    guessLetterButton.classList.add("hide");
+    remainingGuessesElement.classList.add("hide");
+    guessedLettersList.classList.add("hide");
+    playAgainButton.classList.remove("hide");
+};
 
+//add a click event to play again button
+playAgainButton.addEventListener("click", function () {
+    message.classList.remove("win");
+    guessedLetters = [];
+    remainingGuesses = 8;
+    remainingGuessesSpan.innerText = `${remainingGuesses} guesses`;
+    guessedLettersList.innerHTML = "";
+    message.innerText = "";
+    //pulls the new word so the player can play again!
+    getWord();
 
+    //show guess button, paragraph with remaining guesses and the guessed letters once more
+    guessLetterButton.classList.remove("hide");
+    playAgainButton.classList.add("hide");
+    remainingGuessesElement.classList.remove("hide");
+    guessedLettersList.classList.remove("hide"); 
+});
 
 
