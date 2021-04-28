@@ -7,8 +7,27 @@ const remainingGuessesSpan = document.querySelector(".remaining span");
 const message = document.querySelector(".message");
 const playAgainButton = document.querySelector(".play-again");
 
-const word = "magnolia";
+let word = "magnolia";
 const guessedLetters = [];
+let remainingGuesses = 8;
+
+//Add an Async Function
+const getWord = async function () {
+    const response = await fetch("https://gist.githubusercontent.com/skillcrush-curriculum/7061f1d4d3d5bfe47efbfbcfe42bf57e/raw/5ffc447694486e7dea686f34a6c085ae371b43fe/words.txt");
+    //fetching data from a text file instead of a JSON file
+    const words = await response.text();
+    //this is the delimiter you'll use to create the array
+    const wordArray = words.split("\n");
+    //console.log(wordArray);
+    //create a variable to pull a random index from the wordArray
+    const randomIndex = Math.floor(Math.random() * wordArray.length);
+    //pull out a random word from the array and remove any extra whitespace around the word
+    word = wordArray[radomIndex].trim();
+    placeholder(word);
+};
+
+    //Call the New Function
+    getWord();
 
 //Write a Function to Add Placeholders for Each Letter
 const placeholder = function (word) {
@@ -68,6 +87,7 @@ const makeGuess = function (guess) {
         guessedLetters.push(guess);
         console.log(guessedLetters);
         //Call the function inside the else statement
+        countRemainingGuesses(guess);
         showGuessedLetters();
         updateWordInProgress(guessedLetters);
     }
@@ -108,6 +128,25 @@ const updateWordInProgress = function (guessedLetters) {
     checkIfPlayerWon();
 };
 
+//create a function to count guesses remaining
+const countRemainingGuesses = function (guess) {
+    const upperWord = word.toUpperCase();
+    if (!upperWord.includes(guess)) {
+        message.innerText = `Sorry,the word has no letter ${guess}.`;
+        remainingGuesses -= 1;
+    } else {
+        message.innerText = `Great job! Letter ${guess} is in the word!`;
+    }
+
+    if (remainingGuesses === 0) {
+        message.innerHTML = `Game Over! The word was <span class="highlight">${word}</span>.`;
+    } else if (remainingGuesses === 1) {
+        remainingGuessesSpan.innerText = `${remainingGuesses} guess`;
+    } else {
+        remainingGuessesSpan.innerText = `${remainingGuesses} guesses`;
+    }
+};
+
 //Create a Function to Check If the Player Won
 const checkIfPlayerWon = function () {
     if (word.toUpperCase() === wordInProgress.innerText) {
@@ -117,6 +156,7 @@ const checkIfPlayerWon = function () {
         message.innerHTML = `<p class="highlight">You guessed correct the word! Congrats!</p>`;
     }
 };
+
 
 
 
